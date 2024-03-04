@@ -9,6 +9,20 @@ services:
       - "8080:8080"
     volumes:
       - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - db
+    command: sh -c 'while ! nc -z db 5432; do sleep 1; done; uvicorn app.main:app --host 0.0.0.0 --port 8080'
+
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
 
   testing:
     build:
@@ -16,3 +30,5 @@ services:
       target: testing
     volumes:
       - .:/app
+    env_file:
+      - .env

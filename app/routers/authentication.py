@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from logging import getLogger
 from os import getenv
 from typing import Optional
 
@@ -15,6 +16,7 @@ from app.repositories.authentication import get_user_by_username
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
+logger = getLogger(__name__)
 
 SECRET_KEY = getenv('SECRET_KEY')
 ALGORITHM = 'HS256'
@@ -26,8 +28,10 @@ async def _authenticate_user(
 ) -> Optional[UserModel]:
     user = await get_user_by_username(username, db)
     if not user:
+        logger.info(f'user not found: {username}')
         return None
     if not bcrypt.checkpw(password.encode('utf-8'), user.hashed_password):
+        logger.info(f'wrong password for user: {username}')
         return None
     return user
 
@@ -43,6 +47,7 @@ def _create_access_token(data: dict, expires_delta: timedelta) -> str:
 async def get_current_user(
     token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_async_session)
 ) -> Optional[UserModel]:
+    logger.info(f'get current user from token: {token}')
     credentials_exception = HTTPException(
         status_code=401,
         detail='Could not validate credentials',
@@ -52,16 +57,20 @@ async def get_current_user(
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get('sub')
         if username is None:
+            logger.warning(f'attemped to access without valid token')
             raise credentials_exception
         # check if the token is expired
         if 'exp' in payload:
             expiration = datetime.fromtimestamp(payload['exp'])
             if expiration <= datetime.utcnow():
+                logger.warning(f'attemped to access without valid token')
                 raise credentials_exception
     except jwt.PyJWTError:
+        logger.warning(f'attemped to access without valid token')
         raise credentials_exception
     user = await get_user_by_username(username, db)
     if user is None:
+        logger.warning(f'attemped to access without valid token')
         raise credentials_exception
     return user
 
@@ -71,8 +80,10 @@ async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: AsyncSession = Depends(get_async_session),
 ):
+    logger.info(f'login for access token: {form_data.username}')
     user = await _authenticate_user(form_data.username, form_data.password, db)
     if not user:
+        logger.warning(f'login for access token failed: {form_data.username}')
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='Incorrect email or password',

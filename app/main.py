@@ -3,6 +3,7 @@ from fastapi import FastAPI, Depends
 
 from app.database import init_db
 from app.routers import authentication, order
+from app.services.authentication import get_current_user
 
 
 app = FastAPI()
@@ -25,7 +26,7 @@ async def ping():
 
 @app.get('/protected')
 async def protected_endpoint(
-    current_user: dict = Depends(authentication.get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     logger.info(f'accessed protected endpoint: {current_user}')
     return {'message': 'This is a protected endpoint', 'user': current_user}

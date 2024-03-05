@@ -2,11 +2,13 @@ import logging
 from fastapi import FastAPI, Depends
 
 from app.database import init_db
-from app.routers import authentication
+from app.routers import authentication, order
 
 
 app = FastAPI()
 app.include_router(authentication.router)
+app.include_router(order.router)
+
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 

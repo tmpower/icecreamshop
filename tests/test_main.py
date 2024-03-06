@@ -7,6 +7,6 @@ from app.main import app
 @pytest.mark.asyncio
 async def test_ping():
     async with AsyncClient(app=app, base_url='http://test') as client:
-        response = await client.get('/ping')
+        response = await client.get('/healthcheck')
         assert response.status_code == 200
-        assert response.json() == {'ping': 'pong'}
+        assert response.json() == {'status': 'OK!'}

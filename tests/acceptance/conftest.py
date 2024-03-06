@@ -10,7 +10,7 @@ from app.models.user import User
 @pytest.fixture
 async def init_test_db(request: pytest.FixtureRequest) -> AsyncSession:
     async_engine = create_async_engine('sqlite+aiosqlite:///:memory:')
-    async_session = async_sessionmaker(async_engine)
+    async_session = async_sessionmaker(async_engine, expire_on_commit=False)
 
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

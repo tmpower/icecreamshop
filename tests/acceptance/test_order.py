@@ -20,7 +20,9 @@ test_order_obj = {
 
 
 @pytest.mark.asyncio
-async def test_create_order_endpoint_for_user_success(test_user):
+async def test_create_order_endpoint_for_user_success(test_user, mocker):
+    mocker.patch('app.redis.queue.enqueue', return_value=None)
+
     user = await test_user
     login_data = {
         'username': user.username,

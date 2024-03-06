@@ -2,6 +2,7 @@ import logging
 from fastapi import FastAPI, Depends
 
 from app.database import init_db
+from app.redis import queue
 from app.routers import authentication, order
 from app.services.authentication import get_current_user
 

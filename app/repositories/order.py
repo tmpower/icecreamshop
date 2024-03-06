@@ -36,3 +36,7 @@ async def update_order_status(order: Order, status: str, session: AsyncSession) 
     else:
         await session.refresh(order)
         logger.info(f'updated order status in database by username: {order.id}')
+
+
+async def get_order_by_id(order_id: int, session: AsyncSession) -> Optional[Order]:
+    return await session.get(Order, order_id)

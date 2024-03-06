@@ -13,7 +13,7 @@ if db_url is None:
     logger.error('DATABASE_URL not set')
     exit(1)
 async_engine = create_async_engine(db_url)
-async_session = async_sessionmaker(async_engine)
+async_session = async_sessionmaker(async_engine, expire_on_commit=False)
 
 Base = declarative_base()
 

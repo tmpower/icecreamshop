@@ -1,5 +1,3 @@
-from typing import AsyncGenerator
-
 import bcrypt
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -27,15 +25,9 @@ async def init_test_db(request: pytest.FixtureRequest) -> AsyncSession:
 
 
 @pytest.fixture
-async def get_test_session(init_test_db) -> AsyncGenerator[AsyncSession, None]:
+async def test_user(init_test_db) -> User:
     async_session = await init_test_db
     async with async_session() as session:
-        yield session
-
-
-@pytest.fixture
-async def test_user(get_test_session) -> User:
-    async for session in get_test_session:
         app.dependency_overrides[get_async_session] = lambda: session
         test_user = User(
             email='test_user@example.com',

@@ -34,7 +34,7 @@ async def test_create_order_endpoint_for_user_success(test_user, mocker):
         token = response.json()['access_token']
 
         response = await test_client.post(
-            '/order',
+            '/orders',
             json=test_order_obj,
             headers={'Authorization': f'Bearer {token}'},
         )
@@ -58,7 +58,7 @@ async def test_create_order_endpoint_for_user_fail(test_user):
         token = response.json()['access_token']
 
         response = await test_client.post(
-            '/order',
+            '/orders',
             json={'address': 'addrr', 'items': [{'flavor': 'something', 'amount': 0}]},
             headers={'Authorization': f'Bearer {token}'},
         )

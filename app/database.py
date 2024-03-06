@@ -12,7 +12,7 @@ db_url = getenv('DATABASE_URL')
 if db_url is None:
     logger.error('DATABASE_URL not set')
     exit(1)
-async_engine = create_async_engine(db_url, echo=True)
+async_engine = create_async_engine(db_url)
 async_session = async_sessionmaker(async_engine)
 
 Base = declarative_base()

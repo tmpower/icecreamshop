@@ -13,7 +13,7 @@ router = APIRouter()
 logger = getLogger(__name__)
 
 
-@router.post('/order', response_model=dict, status_code=201)
+@router.post('/orders', response_model=dict, status_code=201)
 async def create_order_endpoint(
     order: OrderCreateIcecream,
     token: str = Depends(oauth2_scheme),
@@ -28,8 +28,8 @@ async def create_order_endpoint(
     )
     try:
         order = await place_order(order.to_dict(), current_user, session)
-    except Exception:
-        logger.warning('failed to create order')
+    except Exception as e:
+        logger.warning(f'failed to create order: {e}')
         raise failed_exception
 
     return {
